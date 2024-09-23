@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本加密/解密器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2980b9;
+            margin-bottom: 20px;
+            font-size: 2em;
+            user-select: none;
+        }
+
+        textarea {
+            width: calc(100% - 20px);
+            min-height: 50px;
+            height: 20vh;
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            resize: vertical;
+            user-select: none;
+        }
+
+        #outputText:hover {
+            cursor: not-allowed;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+            user-select: none;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .output-container {
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 14px;
+            color: #777;
+            user-select: none;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>文本加密/解密器</h2>
+
+        <textarea id="inputText" placeholder="输入文本进行加密或解密..."></textarea>
+        <div class="output-container">
+            <textarea id="outputText" placeholder="输出文本..." readonly></textarea>
+        </div>
+
+        <div class="button-container">
+            <button id="encryptButton">加密</button>
+            <button id="decryptButton">解密</button>
+            <button id="copyButton">复制输出</button>
+        </div>
+    </div>
+
+    <div id="toast">已复制输出文本</div>
+
+    <footer>
+        &copy; 2024 余卓航. 该项目源于 <a href="https://github.com/WXVaaHVvaGFuZw/Binary-encryptor">Binary-encryptor</a>. 版权所有.
+    </footer>
+
+    <script>
+        function textToBinary(text) {
+            return Array.from(text).map(char => {
+                return char.charCodeAt(0).toString(2).padStart(16, '0');
+            }).join('');
+        }
+
+        function binaryToText(binary) {
+            const chars = [];
+            for (let i = 0; i < binary.length; i += 16) {
+                const byte = binary.slice(i, i + 16);
+                chars.push(String.fromCharCode(parseInt(byte, 2)));
+            }
+            return chars.join('');
+        }
+
+        function encrypt() {
+            const input = document.getElementById('inputText').value;
+            const binary = textToBinary(input);
+            const encrypted = binary.replace(/0/g, "'").replace(/1/g, '"');
+            document.getElementById('outputText').value = encrypted;
+        }
+
+        function decrypt() {
+            const input = document.getElementById('inputText').value;
+            const binary = input.replace(/'/g, '0').replace(/"/g, '1');
+            const decrypted = binaryToText(binary);
+            document.getElementById('outputText').value = decrypted;
+        }
+
+        function copyOutput() {
+            const outputText = document.getElementById('outputText');
+            outputText.select();
+            document.execCommand('copy');
+
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 1000);
+        }
+
+        document.getElementById('encryptButton').addEventListener('click', encrypt);
+        document.getElementById('decryptButton').addEventListener('click', decrypt);
+        document.getElementById('copyButton').addEventListener('click', copyOutput);
+    </script>
+
+</body>
+
+</html>
